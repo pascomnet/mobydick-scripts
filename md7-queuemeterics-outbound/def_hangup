@@ -1,0 +1,22 @@
+exten => s,1,NoOp(>>>macro-hangup:: EXTEN: ${ARG1} DIALSTATUS: ${ARG2} QUEUESTATUS: ${ARG3} HANGUPCAUSE: )
+exten => s,n,GoToIf($[ "${QOUT}"="1" ]?qlogset,1)
+ 
+exten => qlogset,1,NoOp(SET QUEUE LOG ${MDC_CALLEE_HANGUP})
+exten => qlogset,n,Set(endtime=${EPOCH})
+exten => qlogset,n,Set(totaltime=$[${endtime} - ${starttime}])
+exten => qlogset,n,Set(waittime=$[${totaltime} - ${ANSWEREDTIME}])
+exten => qlogset,n,NoOp(${totaltime} ${waittime} ${ANSWEREDTIME})
+exten => qlogset,n,GoToIf($[ "${ARG2}"!="ANSWER" ]?abandon,1)
+exten => qlogset,n,GoToIf($[ "${MDC_CALLEE_HANGUP}"="1" ]?completecaller,1)
+exten => qlogset,n,Goto(completeagent,1)
+ 
+exten => abandon,1,QueueLog(${OUTQUEUE},${UNIQUEID},NONE,ABANDON,1|1|${TOTALTIME}
+exten => abandon,n,Hangup()
+ 
+exten => completecaller,1,QueueLog(${OUTQUEUE},${UNIQUEID},Agent/${MDC_CALLER_NUM},CONNECT,${WAITTIME}|)
+exten => completecaller,n,QueueLog(${OUTQUEUE},${UNIQUEID},Agent/${MDC_CALLER_NUM},COMPLETECALLER,${WAITTIME}|${ANSWEREDTIME})
+exten => completecaller,n,Hangup()
+ 
+exten => completeagent,1,QueueLog(${OUTQUEUE},${UNIQUEID},Agent/${MDC_CALLER_NUM},CONNECT,${WAITTIME}|)
+exten => completeagent,n,QueueLog(${OUTQUEUE},${UNIQUEID},Agent/${MDC_CALLER_NUM},COMPLETEAGENT,${WAITTIME}|${ANSWEREDTIME})
+exten => completeagent,n,Hangup()

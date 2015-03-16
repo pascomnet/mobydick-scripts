@@ -1,0 +1,18 @@
+; outbound context for queue1-outbound extension 171-175
+exten => _0X./_17[1-5],1,Set(OUTQUEUE=queue1-outbound)
+exten => _0X./_17[1-5],n,GotoIf($[ "${MDC_ALIAS_HOP}" > "1" ]?mdc_outgoing,${EXTEN},1)
+exten => _0X./_17[1-5],n,Set(tmpexten=${EXTEN})
+exten => _0X./_17[1-5],n,Goto(s-q-out,1)
+ 
+; outbound context for queue2-outbound extension 130-139
+exten => _0X./_13X,1,Set(OUTQUEUE=queue2-outbound)
+exten => _0X./_13X,n,GotoIf($[ "${MDC_ALIAS_HOP}" > "1" ]?mdc_outgoing,${EXTEN},1)
+exten => _0X./_13X,n,Set(tmpexten=${EXTEN})
+exten => _0X./_13X,n,Goto(s-q-out,1)
+ 
+exten => s-q-out,1,NoOp(custom Outbound QUEUE)
+exten => s-q-out,n,Set(qout=1)
+exten => s-q-out,n,Set(starttime=${EPOCH})
+exten => s-q-out,n,QueueLog(${OUTQUEUE},${UNIQUEID},NONE,ENTERQUEUE,-|${TMPEXTEN:1})
+exten => s-q-out,n,QueueLog(${OUTQUEUE},${UNIQUEID},Agent/${MDC_CALLER_NUM},CONNECT,0|)
+exten => s-q-out,n,Goto(mdc_outgoing,${TMPEXTEN},1)
