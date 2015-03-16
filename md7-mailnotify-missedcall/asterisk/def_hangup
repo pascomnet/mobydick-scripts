@@ -1,0 +1,3 @@
+exten => s,1,NoOp(Hangup Macro)
+exten => s,n,GosubIf($[ "${DIALSTATUS}"!="ANSWER" ]?custom-missed,s,1)
+exten => s,n,NoOp(>>>def_hangup:: EXTEN: ${ARG1} DIALSTATUS: ${ARG2} QUEUESTATUS: ${ARG3} REASON: ${ARG4})
