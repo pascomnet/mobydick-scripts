@@ -1,0 +1,39 @@
+ ; set queue to check
+exten => s,1,Set(CHECKQUEUE=queue1)
+exten => s,n,Verbose(--> QUEUE CHECK FOR QUEUE ${CHECKQUEUE})
+
+; queue check
+exten => s,n,Set(QUEUEFREE=${QUEUE_MEMBER(${CHECKQUEUE},free)})
+exten => s,n,Set(QUEUELOGGED=${QUEUE_MEMBER(${CHECKQUEUE},logged)})
+exten => s,n,Set(QUEUECOUNT=${QUEUE_MEMBER(${CHECKQUEUE},count)})
+exten => s,n,Set(QUEUEREADY=${QUEUE_MEMBER(${CHECKQUEUE},ready)})
+exten => s,n,Set(QUEUEWAIT=${QUEUE_WAITING_COUNT(${CHECKQUEUE})})
+
+exten => s,n,Verbose(--> QUEUEFREE: ${QUEUEFREE} -- QUEUELOGGED: ${QUEUELOGGED} -- QUEUECOUNT: ${QUEUECOUNT} -- QUEUEREADY: ${QUEUEREADY} -- QUEUEWAIT: ${QUEUEWAIT})
+ 
+;no agent logged on?
+;exten => s,n,GoToIf($[ "${QUEUECOUNT}" = "0" ]?s-empty,1)
+ 
+;no available agent logged on?
+;exten => s,n,GoToIf($[ "${QUEUELOGGED}" = "0" & "${QUEUEFREE}" = "0" ]?s-noavailable,1)
+ 
+;no agent free?
+;exten => s,n,GoToIf($[ "${QUEUEFREE}" = "0" ]?s-allbusy,1)
+ 
+;more than n callers waiting?
+;exten => s,n,GoToIf($[ ${QUEUEWAIT} > 10 ]?s-full,1)
+ 
+; back to queue
+exten => s,n,Return()
+
+exten => s-empty,1,...
+exten => s-empty,n,Hangup()
+
+exten => s-noavailable,1,...
+exten => s-noavailable,n,Hangup()
+
+exten => s-allbusy,1,...
+exten => s-allbusy,n,Hangup()
+
+exten => s-full,1,...
+exten => s-full,n,Hangup()
