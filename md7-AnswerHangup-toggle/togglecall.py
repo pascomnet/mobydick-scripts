@@ -3,24 +3,26 @@
 import urllib2
 import json
 import sys
-import argparse
+import configparser
 
-parser = argparse.ArgumentParser(description='Hangup/Answer Rest Call for Mobydick')
+config = configparser.ConfigParser()
 
-parser.add_argument('-u','--user',
-                    help='sepcify the rest user', required=True)
-parser.add_argument('-p','--password',
-                    help='sepcify the password of the rest user', required=True)
-parser.add_argument('-m','--mobydick',
-                    help='sepcify the mobydick host adress', required=True)
+try:
+    config.read_file(open('/Users/tmattausch/work/conf/rest.conf'))
+except IOError:
+    print "ERR: configuration file could not be found"
+    sys.exit(3)
 
-args = vars(parser.parse_args())
+try:
+    user = config.get('REST','user')
+    password = config.get('REST','password')
+    mobydick = config.get('REST','host')
+except:
+    print "ERR in config"
+    sys.exit(3)
 
-user = args['user']
-password = args['password']
-url = 'http://' + args['mobydick'] + '/services/identity/states?keys=' + user
-urlaction = 'http://' + args['mobydick'] + '/services/identity/' + user + '/defaultdevice/action'
-
+url = 'http://' + mobydick + '/services/identity/states?keys=' + user
+urlaction = 'http://' + mobydick + '/services/identity/' + user + '/defaultdevice/action'
 
 password_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
 password_manager.add_password(
