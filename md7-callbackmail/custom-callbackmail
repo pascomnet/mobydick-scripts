@@ -1,0 +1,4 @@
+exten => s,1,Set(mail=test@test.net)
+smae => n,NoOp(MAIL TO ${MAIL})
+same => n,system(echo "" | mail -s "Mobydick: Verpasster Anruf von ${CALLERID(num)} ${CALLERID(name)} an ${MDC_EXTEN} um ${STRFTIME(${EPOCH},,%Y-%m-%d %H:%M:%S)}" ${MAIL})
+same => n,Return()
