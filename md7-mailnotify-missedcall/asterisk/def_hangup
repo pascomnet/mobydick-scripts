@@ -1,3 +1,6 @@
 exten => s,1,NoOp(Hangup Macro)
+exten => s,n,Set(chanstate=${CHANNEL(state)})
+; check for queue 5000
+exten => s,n,GoToIf($[ "${MDC_EXTEN}" = "5000" & "${CHANSTATE}" = "Ring"  ]?custom-missed,s,1)
 exten => s,n,GosubIf($[ "${DIALSTATUS}"!="ANSWER" ]?custom-missed,s,1)
 exten => s,n,NoOp(>>>def_hangup:: EXTEN: ${ARG1} DIALSTATUS: ${ARG2} QUEUESTATUS: ${ARG3} REASON: ${ARG4})
