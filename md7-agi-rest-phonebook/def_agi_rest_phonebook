@@ -1,0 +1,12 @@
+#perform search only if name is not set
+exten => s,1,GotoIf($[ "${CALLERID(name)}" != "" ] ?skip)
+#you can use CALLERID(num) instead of MDC_CALLER_NUM_INTERNAT if you dont want full number
+#invoke AGI 
+same => n,AGI(agi_rest_phonebook.php,${MDC_CALLER_NUM_INTERNAT})
+#check execution result
+same => n,GoToIf($[ "${AGISTATUS}" = "FAILURE" ]?skip)
+#AGI php script should set variable HTTP_CALLER_ID if matching result is found
+same => n,ExecIf($[ "${HTTP_CALLER_ID}" != "" ]?Verbose(1,"${HTTP_CALLER_ID}")
+same => n,ExecIf($[ "${HTTP_CALLER_ID}" != "" ]?Set(CALLERID(name)=${HTTP_CALLER_ID}))
+same => n,Return()
+same => n(skip),Return()
